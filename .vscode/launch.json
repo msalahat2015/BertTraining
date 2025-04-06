@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: train.py with Arguments",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/classify/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--output_path",
+                "${workspaceFolder}/outputV2",
+                "--train_path",
+                "${workspaceFolder}/dataV2/task1_train.csv",
+                "--val_path",
+                "${workspaceFolder}/dataV2/task1_validation.csv",
+                "--test_path",
+                "${workspaceFolder}/dataV2/task1_test.csv",
+                "--gpus",
+                "0",
+                "--batch_size",
+                "1",
+                "--num_workers",
+                "4",
+                "--seed",
+                "42",
+                "--max_epochs",
+                "5",
+                "--bert_model",
+                "aubmindlab/bert-base-arabertv2",
+                "--learning_rate",
+                "2e-5"
+            ],
+            "env": {
+                "PYTHONPATH": "${env:PYTHONPATH};D:\\Code"
+            }
+        }
+    ]
+}

@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument("--num_workers", type=int, default=2, help="Number of data loader workers")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--max_epochs", type=int, default=5, help="Maximum number of training epochs")
-    parser.add_argument("--bert_model", type=str, default="asafaya/bert-large-arabic", help="Pre-trained BERT model name")
+    parser.add_argument("--bert_model", type=str, default="aubmindlab/bert-base-arabertv2", help="Pre-trained BERT model name")
     parser.add_argument("--learning_rate", type=float, default=2e-5, help="Learning rate for optimizer")
     args = parser.parse_args()
     return args
@@ -38,19 +38,22 @@ def main(args):
     )
 
     # Set the seed for randomization
+    print("Set the seed for randomization")
     set_seed(args.seed)
 
     # Get the datasets and vocab for labels
     datasets, vocab = parse_data_files((args.train_path, args.val_path, args.test_path))
 
     # From the datasets generate the dataloaders
+    print("From the datasets generate the dataloaders")
     datasets = [
         DefaultDataset(
             segments=dataset, vocab=vocab, bert_model=args.bert_model
         )
         for dataset in datasets
     ]
-
+    print(datasets)
+    print("start gen dataloader")
     shuffle = (True, False, False)
     train_dataloader, val_dataloader, test_dataloader = [DataLoader(
         dataset=dataset,
@@ -61,6 +64,7 @@ def main(args):
     ) for i, dataset in enumerate(datasets)]
 
     # Initialize the model
+    print("# Initialize the model")
     model = BertClassifier(
         bert_model=args.bert_model, num_labels=len(vocab), dropout=0.1
     )
@@ -73,11 +77,14 @@ def main(args):
         model = model.cuda()
 
     # Initialize the optimizer
+    print("# Initialize the optimizer")
     optimizer = torch.optim.AdamW(lr=args.learning_rate, params=model.parameters())
 
     # Initialize the loss function
+    print("# Initialize the loss function")
     loss = torch.nn.CrossEntropyLoss()
-
+    
+    print("# Initialize the trainer")
     # Initialize the trainer
     trainer = BertTrainer(
         model=model,
@@ -89,7 +96,9 @@ def main(args):
         output_path=args.output_path,
         max_epochs=args.max_epochs,
     )
+    print("# Train..")
     trainer.train()
+    print("# End Train..")
     return
 
 

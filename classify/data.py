@@ -21,7 +21,7 @@ class Segment:
 
 
 class BertSeqTransform:
-    def __init__(self, bert_model, vocab, max_seq_len=512):
+    def __init__(self, bert_model, vocab, max_seq_len=128):
         self.tokenizer = BertTokenizer.from_pretrained(bert_model)
         self.encoder = partial(
             self.tokenizer.encode_plus,  # Use encode_plus for explicit handling of pairs
@@ -48,7 +48,7 @@ class DefaultDataset(Dataset):
         segments=None,
         vocab=None,
         bert_model="aubmindlab/bert-base-arabertv2",
-        max_seq_len=512,
+        max_seq_len=128,
     ):
         """
         The dataset that used to transform the segments into training data
