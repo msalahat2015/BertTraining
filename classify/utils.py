@@ -10,43 +10,30 @@ from comp9312.classify.data import Segment
 logger = logging.getLogger(__name__)
 
 
-def parse_data_files(data_paths):
-    """
-    Parse data files (assumed to have 'sentence1', 'sentence2', and 'label' columns)
-    and return list of segments for each file and index the labels.
-    :param data_paths: tuple(Path) - tuple of filenames
-    :return: tuple( [[Segment, ...], [Segment, ...]], label_vocab )
-    """
-    datasets, labels = list(), list()
+def parse_data_files(file_paths):
+    all_data = []
+    label_counter = Counter()
 
-    for data_path in data_paths:
-        df = pd.read_csv(data_path)  # Assuming CSV, adjust if needed
-        dataset = [Segment(sentence1=kwargs['sentence1'], sentence2=kwargs['sentence2'], label=kwargs['label'])
-                   for kwargs in df.to_dict(orient="records")]
-        datasets.append(dataset)
-        labels += [segment.label for segment in dataset]
+    for file_path in file_paths:
+        df = pd.read_csv(file_path)
+        for index, row in df.iterrows():
+            sentence1 = row['sentence1']
+            sentence2 = row['sentence2']
+            label = str(row['label'])  # Convert label to string here
+            all_data.append({'sentence1': sentence1, 'sentence2': sentence2, 'label': label})
+            label_counter[label] += 1
 
-    # Generate vocabs for tags (labels)
-    counter = Counter(labels)
-    counter = OrderedDict(sorted(counter.items(), key=lambda x: x[1], reverse=True))
-    label_vocab = vocab(counter)
-    return tuple(datasets), label_vocab
+    label_vocab = vocab(label_counter)
+    label_vocab.set_default_index(label_vocab["0"] if "0" in label_vocab else 0) # Set a default index
 
+    return all_data, label_vocab
 
 def set_seed(seed):
-    """
-    Set the seed for random initialization and set
-    CUDANN parameters to ensure deterministic results across
-    multiple runs with the same seed
-
-    :param seed: int
-    """
-    np.random.seed(seed)
+    import torch
+    import random
+    import numpy as np
     random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.enabled = False
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
