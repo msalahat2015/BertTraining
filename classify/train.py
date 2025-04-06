@@ -12,26 +12,18 @@ from comp9312.classify.data import DefaultDataset
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--output_path", type=str, required=True, help="Output path",
-    )
-
-    parser.add_argument(
-        "--train_path", type=str, required=True, help="Path to training data (must have sentence1, sentence2, label columns)",
-    )
-
-    parser.add_argument(
-        "--val_path", type=str, required=True, help="Path to validation data (must have sentence1, sentence2, label columns)",
-    )
-
-    parser.add_argument(
-        "--test_path", type=str, required=True, help="Path to test data (must have sentence1, sentence2, label columns)",
-    )
-
-    # ... (other arguments remain the same)
-
+    parser = argparse.ArgumentParser(description="Training script for your model")
+    parser.add_argument("--output_path", type=str, required=True, help="Path to save output")
+    parser.add_argument("--train_path", type=str, required=True, help="Path to training data")
+    parser.add_argument("--val_path", type=str, required=True, help="Path to validation data")
+    parser.add_argument("--test_path", type=str, required=True, help="Path to test data")
+    parser.add_argument("--gpus", type=str, default="0", help="Comma-separated list of GPU IDs")
+    parser.add_argument("--batch_size", type=int, default=16, help="Batch size for training")
+    parser.add_argument("--num_workers", type=int, default=2, help="Number of data loader workers")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument("--max_epochs", type=int, default=5, help="Maximum number of training epochs")
+    parser.add_argument("--bert_model", type=str, default="asafaya/bert-large-arabic", help="Pre-trained BERT model name")
+    parser.add_argument("--learning_rate", type=float, default=2e-5, help="Learning rate for optimizer")
     args = parser.parse_args()
     return args
 
@@ -102,4 +94,9 @@ def main(args):
 
 
 if __name__ == "__main__":
+    args = parse_args()
+    print(f"Output Path: {args.output_path}")
+    print(f"Train Path: {args.train_path}")
+    print(f"GPUs: {args.gpus}")
+    print(f"Batch Size: {args.batch_size}")
     main(parse_args())
